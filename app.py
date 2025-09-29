@@ -41,6 +41,9 @@ def update_progress(session_id, step, status='active', message='', file_path=Non
             'timestamp': datetime.now().isoformat()
         }
         print(f"Progress update: Session {session_id}, Step {step}, Status {status}, Message: {message}")
+        
+        # CRITICAL DEBUG: Show the exact data being stored
+        print(f"DEBUG: Progress data for {session_id}: {progress_data[session_id]}")
 
 def get_progress(session_id):
     """Get current progress for a session"""
