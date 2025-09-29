@@ -1356,7 +1356,7 @@
                     </div>
                     
                     <div class="file-drop-zone" data-target="excelfile">
-                        <input type="file" id="excelfile" name="excelfile" accept=".xlsx,.xls" required class="file-input">
+                        <input type="file" id="excel_file" name="excel_file" accept=".xlsx,.xls" required class="file-input">
                         <div class="drop-content">
                             <div class="drop-icon">
                                 <i class="fas fa-upload"></i>
@@ -1389,7 +1389,7 @@
                     </div>
                     
                     <div class="file-drop-zone" data-target="pptfile">
-                        <input type="file" id="pptfile" name="pptfile" accept=".pptx,.ppt" required class="file-input">
+                        <input type="file" id="ppt_file" name="ppt_file" accept=".pptx,.ppt" required class="file-input">
                         <div class="drop-content">
                             <div class="drop-icon">
                                 <i class="fas fa-upload"></i>
@@ -1950,8 +1950,8 @@
                     const messagesDiv = document.getElementById('messages');
     
                     // Validate files are selected
-                    const excelFile = document.getElementById('excelfile').files[0];
-                    const pptFile = document.getElementById('pptfile').files[0];
+                    const excelFile = document.getElementById('excel_file').files[0];
+                    const pptFile = document.getElementById('ppt_file').files[0];
     
                     if (!excelFile || !pptFile) {
                         if (messagesDiv) {
