@@ -65,7 +65,9 @@ def generate_ppt_with_progress(excel_path, ppt_path, output_path, session_id):
     
     def progress_update_callback(step, status, message, file_path=None):
         """Callback function to update progress"""
-        update_progress(session_id, step, status, message, file_path)
+        # Use output_path instead of file_path for completed status
+        final_path = output_path if status == 'completed' and step == 8 else file_path
+        update_progress(session_id, step, status, message, final_path)
     
     # Set the callback in main_script
     set_progress_callback(progress_update_callback)
