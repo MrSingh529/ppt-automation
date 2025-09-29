@@ -13,7 +13,7 @@ from io import BytesIO
 import uuid
 
 # Import your existing script functions  
-from main_script import main as generate_ppt
+from main_script import main as generate_ppt, set_progress_callback
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('FLASK_SECRET_KEY', 'dev-key-change-in-production')
@@ -59,6 +59,19 @@ def safe_cleanup(file_paths):
                 print(f"Successfully removed: {file_path}")
             except Exception as e:
                 print(f"Could not cleanup {file_path}: {e}")
+
+def generate_ppt_with_progress(excel_path, ppt_path, output_path, session_id):
+    """Wrapper function to call main script with progress updates"""
+    
+    def progress_update_callback(step, status, message, file_path=None):
+        """Callback function to update progress"""
+        update_progress(session_id, step, status, message, file_path)
+    
+    # Set the callback in main_script
+    set_progress_callback(progress_update_callback)
+    
+    # Call your main function
+    generate_ppt(excel_path, ppt_path, output_path)
 
 @app.route('/')
 def index():
@@ -181,27 +194,37 @@ def generate_with_progress():
         excel_file.save(excel_path)
         ppt_file.save(ppt_path)
         
-        def background_generation():
+        def generate_with_real_progress():
+            """Background generation function with real progress tracking"""
             try:
-                update_progress(session_id, 1, 'active', 'Files uploaded successfully')
-                generate_ppt(excel_path, ppt_path, output_path)
-                update_progress(session_id, 8, 'completed', 'Generation completed!', output_path)
-            except Exception as e:
-                update_progress(session_id, -1, 'error', f'Error: {str(e)}')
-            finally:
-                # Cleanup files after delay
-                def delayed_cleanup():
-                    time.sleep(30)  # Wait 30 seconds before cleanup
-                    safe_cleanup([excel_path, ppt_path])
+                # Step 1: Files already saved
+                update_progress(session_id, 1, 'completed', 'Files saved successfully')
                 
+                # Call the progress-aware generation function
+                generate_ppt_with_progress(excel_path, ppt_path, output_path, session_id)
+                
+            except Exception as e:
+                current_step = get_progress(session_id).get('step', 1)
+                update_progress(session_id, current_step, 'error', f'Error: {str(e)}')
+                print(f"Error in background generation: {traceback.format_exc()}")
+                
+            finally:
+                # Cleanup files (delay for download)
+                def delayed_cleanup():
+                    time.sleep(30)  # Wait longer for download
+                    files_to_cleanup = []
+                    if excel_path and os.path.exists(excel_path):
+                        files_to_cleanup.append(excel_path)
+                    if ppt_path and os.path.exists(ppt_path):
+                        files_to_cleanup.append(ppt_path)
+                    safe_cleanup(files_to_cleanup)
+
                 cleanup_thread = threading.Thread(target=delayed_cleanup)
                 cleanup_thread.daemon = True
                 cleanup_thread.start()
-        
+
         # Start background processing
-        processing_thread = threading.Thread(target=background_generation)
-        processing_thread.daemon = True
-        processing_thread.start()
+        threading.Thread(target=generate_with_real_progress, daemon=True).start()
         
         # Return JSON response with redirect URL
         return jsonify({
