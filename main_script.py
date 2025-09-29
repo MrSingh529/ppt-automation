@@ -3437,9 +3437,14 @@ def main(excel_file, ppt_template, output_ppt, callback=None):
         update_step_progress(8, 'active', 'Saving final presentation...')
         prs.save(output_ppt)
         print(f"Presentation saved: {output_ppt}")
-        
-        # In your main() function, when step 8 completes:
-        update_step_progress(8, 'completed', 'Presentation saved successfully', output_ppt)
+
+        # Add this debug line
+        print("About to call update_step_progress(8, 'completed')")
+
+        # CRITICAL: Mark completion for progress tracking  
+        update_step_progress(8, 'completed', 'Presentation generated successfully!', output_ppt)
+
+        print("Completion update called successfully!")
         
     except Exception as e:
         print(f"Error in main processing: {e}")
