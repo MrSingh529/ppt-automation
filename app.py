@@ -1,4 +1,3 @@
-
 from flask import Flask, render_template, request, send_file, flash, redirect, url_for, jsonify, Response
 import os
 import tempfile
@@ -13,13 +12,16 @@ import threading
 from io import BytesIO
 import uuid
 
-# Import your existing script functions
+# Import your existing script functions  
 from main_script import main as generate_ppt
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('FLASK_SECRET_KEY', 'dev-key-change-in-production')
 app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024  # 50MB max file size
 
+# For cloud deployment, create temporary folders
+UPLOAD_FOLDER = tempfile.mkdtemp()
+OUTPUT_FOLDER = tempfile.mkdtemp()
 ALLOWED_EXTENSIONS = {'xlsx', 'pptx'}
 
 # Progress tracking globals (in-memory)
@@ -45,14 +47,18 @@ def get_progress(session_id):
     with progress_lock:
         return progress_data.get(session_id, {'step': 0, 'status': 'waiting', 'message': ''})
 
-def cleanup_progress(session_id):
-    """Clean up progress data for a session"""
-    with progress_lock:
-        if session_id in progress_data:
-            del progress_data[session_id]
-
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+def safe_cleanup(file_paths):
+    """Safely cleanup files with retry logic"""
+    for file_path in file_paths:
+        if os.path.exists(file_path):
+            try:
+                os.remove(file_path)
+                print(f"Successfully removed: {file_path}")
+            except Exception as e:
+                print(f"Could not cleanup {file_path}: {e}")
 
 @app.route('/')
 def index():
@@ -138,6 +144,74 @@ def generate():
                 print(f"Cleaned up temporary directory: {temp_dir}")
             except Exception as e:
                 print(f"Warning: Could not clean up temp directory: {e}")
+
+@app.route('/generate-with-progress', methods=['POST'])
+def generate_with_progress():
+    """Generate presentation with real-time progress updates"""
+    import uuid
+    session_id = str(uuid.uuid4())
+    
+    try:
+        # Validate files
+        if 'excel_file' not in request.files or 'ppt_file' not in request.files:
+            return jsonify({'error': 'Please select both Excel and PowerPoint files'}), 400
+
+        excel_file = request.files['excel_file']
+        ppt_file = request.files['ppt_file']
+
+        if excel_file.filename == '' or ppt_file.filename == '':
+            return jsonify({'error': 'Please select both files'}), 400
+
+        if not (allowed_file(excel_file.filename) and allowed_file(ppt_file.filename)):
+            return jsonify({'error': 'Please upload valid Excel (.xlsx) and PowerPoint (.pptx) files'}), 400
+
+        # Initialize progress
+        update_progress(session_id, 0, 'active', 'Processing files...')
+        
+        # Save files
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        excel_filename = f"excel_{timestamp}_{secure_filename(excel_file.filename)}"
+        ppt_filename = f"ppt_{timestamp}_{secure_filename(ppt_file.filename)}"
+        
+        excel_path = os.path.join(UPLOAD_FOLDER, excel_filename)
+        ppt_path = os.path.join(UPLOAD_FOLDER, ppt_filename)
+        output_filename = f"generated_presentation_{timestamp}.pptx"
+        output_path = os.path.join(OUTPUT_FOLDER, output_filename)
+        
+        excel_file.save(excel_path)
+        ppt_file.save(ppt_path)
+        
+        def background_generation():
+            try:
+                update_progress(session_id, 1, 'active', 'Files uploaded successfully')
+                generate_ppt(excel_path, ppt_path, output_path)
+                update_progress(session_id, 8, 'completed', 'Generation completed!', output_path)
+            except Exception as e:
+                update_progress(session_id, -1, 'error', f'Error: {str(e)}')
+            finally:
+                # Cleanup files after delay
+                def delayed_cleanup():
+                    time.sleep(30)  # Wait 30 seconds before cleanup
+                    safe_cleanup([excel_path, ppt_path])
+                
+                cleanup_thread = threading.Thread(target=delayed_cleanup)
+                cleanup_thread.daemon = True
+                cleanup_thread.start()
+        
+        # Start background processing
+        processing_thread = threading.Thread(target=background_generation)
+        processing_thread.daemon = True
+        processing_thread.start()
+        
+        # Return JSON response with redirect URL
+        return jsonify({
+            'status': 'success',
+            'session_id': session_id,
+            'redirect_url': f'/progress-view/{session_id}'
+        })
+        
+    except Exception as e:
+        return jsonify({'error': f'Upload failed: {str(e)}'}), 500
 
 @app.route('/health')
 def health_check():
