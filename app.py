@@ -82,10 +82,8 @@ def index():
 @app.route('/generate', methods=['POST'])
 def generate():
     """Generate presentation using temporary files only"""
-    excel_file = None
-    ppt_file = None
     temp_dir = None
-
+    
     try:
         # Validate files
         if 'excel_file' not in request.files or 'ppt_file' not in request.files:
@@ -102,20 +100,18 @@ def generate():
 
         # Create temporary directory
         temp_dir = tempfile.mkdtemp()
-
+        
         # Generate unique filenames
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        session_id = str(uuid.uuid4())
-
         excel_filename = f"excel_{timestamp}_{secure_filename(excel_file.filename)}"
         ppt_filename = f"ppt_{timestamp}_{secure_filename(ppt_file.filename)}"
         output_filename = f"generated_presentation_{timestamp}.pptx"
-
+        
         # Save files to temporary directory
         excel_path = os.path.join(temp_dir, excel_filename)
         ppt_path = os.path.join(temp_dir, ppt_filename)
         output_path = os.path.join(temp_dir, output_filename)
-
+        
         excel_file.save(excel_path)
         ppt_file.save(ppt_path)
 
@@ -133,7 +129,7 @@ def generate():
         # Read file into memory for sending
         with open(output_path, 'rb') as f:
             file_data = f.read()
-
+        
         # Create BytesIO object
         file_io = BytesIO(file_data)
         file_io.seek(0)
@@ -163,8 +159,7 @@ def generate():
 @app.route('/generate-with-progress', methods=['POST'])
 def generate_with_progress():
     """Generate presentation with real-time progress updates"""
-    import uuid
-    session_id = str(uuid.uuid4())
+    session_id = str(uuid.uuid4())  # ✅ Remove duplicate import uuid line
     
     try:
         # Validate files
@@ -225,7 +220,7 @@ def generate_with_progress():
                 cleanup_thread.daemon = True
                 cleanup_thread.start()
 
-        # Start background processing
+        # Start the generation process in a separate thread
         threading.Thread(target=generate_with_real_progress, daemon=True).start()
         
         # Return JSON response with redirect URL
