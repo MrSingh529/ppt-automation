@@ -19,3 +19,8 @@ uploads/
 # Ignore other system files
 .DS_Store
 Thumbs.db
+
+# Ignore the Lib folder
+Lib/
+# Ignore the Scripts folder
+Scripts/
