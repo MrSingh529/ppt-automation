@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>IMARC Data²Deck — Progress</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<style>
+  :root {
+    --primary-color:#007AFF; --accent-color:#5AC8FA;
+    --success:#34C759; --error:#FF3B30; --bg:#0b1220; --card:#0f172a; --muted:#94a3b8; --text:#e2e8f0; --border:#1e293b;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:linear-gradient(180deg,#0b1220,#0a1020);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Helvetica Neue",Arial,sans-serif;}
+  .wrap{min-height:100vh;display:flex;flex-direction:column}
+  header{padding:16px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;background:rgba(15,23,42,.6);backdrop-filter:blur(12px);position:sticky;top:0;z-index:10}
+  .badge{margin-left:auto;background:rgba(90,200,250,.15);border:1px solid rgba(90,200,250,.35);padding:6px 10px;border-radius:999px;font-weight:600}
+  main{flex:1;display:grid;place-items:center;padding:32px}
+  .panel{width:min(1100px,95vw);background:rgba(15,23,42,.7);border:1px solid var(--border);border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.35);padding:24px}
+  .title{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+  .subtitle{color:var(--muted);margin-bottom:24px}
+  .steps{display:grid;grid-template-columns:1fr;gap:12px}
+  .step{display:flex;gap:14px;align-items:flex-start;background:#0b1220;border:1px solid var(--border);border-radius:12px;padding:14px}
+  .step .icon{width:40px;height:40px;display:grid;place-items:center;border-radius:999px;background:#111827;color:#9ca3af}
+  .step.active .icon{background:var(--primary-color);color:white;animation:pulse 2s infinite}
+  .step.done   .icon{background:var(--success);color:white}
+  .step.error  .icon{background:var(--error);color:white}
+  .step .meta{flex:1}
+  .step .name{font-weight:700}
+  .step .desc{color:var(--muted);font-size:.95rem}
+  .spinner{width:18px;height:18px;border:2px solid #334155;border-top-color:white;border-radius:999px;animation:spin 1s linear infinite;margin-left:auto}
+  .check{margin-left:auto;color:var(--success)}
+  .err{margin-left:auto;color:var(--error)}
+  .footer{display:flex;justify-content:space-between;align-items:center;margin-top:18px;color:var(--muted);font-size:.95rem}
+  .btn{color:white;text-decoration:none;border:1px solid var(--border);padding:8px 12px;border-radius:10px}
+  .btn:hover{border-color:#334155}
+  .hidden{display:none}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+  /* success full-screen */
+  .success{position:fixed;inset:0;background:linear-gradient(135deg,#10b981,#059669);display:none;align-items:center;justify-content:center;z-index:9999;color:white;text-align:center;padding:24px}
+  .success.show{display:flex}
+  .success .tick{width:120px;height:120px;border:4px solid white;border-radius:999px;display:grid;place-items:center;margin:0 auto 20px;position:relative}
+  .success .tick::before{content:"";position:absolute;width:44px;height:22px;border:4px solid white;border-top:none;border-right:none;transform:rotate(-45deg)}
+  .success h1{font-size:2.25rem;margin:12px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <img src="/static/images/IMARClogo.jpg" alt="IMARC" style="width:36px;height:36px;border-radius:8px;border:1px solid var(--border);background:#fff;padding:2px">
+    <strong>IMARC Data²Deck</strong>
+    <span class="badge">Live Progress</span>
+  </header>
+
+  <main>
+    <section class="panel">
+      <div class="title"><i class="fa-solid fa-rocket"></i><h2 style="margin:0">Generating your presentation…</h2></div>
+      <div class="subtitle">Do not close this tab. We’ll auto-download the PPT when ready.</div>
+
+      <div id="steps" class="steps">
+        <!-- Steps 1..8 -->
+        <div class="step" id="step-1"><div class="icon"><i class="fa-solid fa-file-excel"></i></div><div class="meta"><div class="name">Reading Excel Data</div><div class="desc">Loading worksheets and extracting key-value pairs</div></div><div class="spinner"></div></div>
+        <div class="step" id="step-2"><div class="icon"><i class="fa-solid fa-database"></i></div><div class="meta"><div class="name">Processing Data Sheets</div><div class="desc">Extracting segmentation data and market metrics</div></div><div class="spinner"></div></div>
+        <div class="step" id="step-3"><div class="icon"><i class="fa-solid fa-brain"></i></div><div class="meta"><div class="name">AI Content Generation</div><div class="desc">Generating market insights and overview content</div></div><div class="spinner"></div></div>
+        <div class="step" id="step-4"><div class="icon"><i class="fa-solid fa-file-powerpoint"></i></div><div class="meta"><div class="name">Loading PowerPoint Template</div><div class="desc">Opening template and identifying placeholders</div></div><div class="spinner"></div></div>
+        <div class="step" id="step-5"><div class="icon"><i class="fa-solid fa-exchange-alt"></i></div><div class="meta"><div class="name">Replacing Placeholders</div><div class="desc">Updating text, tables, and lists</div></div><div class="spinner"></div></div>
+        <div class="step" id="step-6"><div class="icon"><i class="fa-solid fa-chart-bar"></i></div><div class="meta"><div class="name">Updating Charts</div><div class="desc">Regenerating charts with latest data</div></div><div class="spinner"></div></div>
+        <div class="step" id="step-7"><div class="icon"><i class="fa-solid fa-table"></i></div><div class="meta"><div class="name">Processing Tables</div><div class="desc">Filling company data and dynamic tables</div></div><div class="spinner"></div></div>
+        <div class="step" id="step-8"><div class="icon"><i class="fa-solid fa-save"></i></div><div class="meta"><div class="name">Saving Presentation</div><div class="desc">Finalizing and saving the deck</div></div><div class="spinner"></div></div>
+      </div>
+
+      <div class="footer">
+        <div>Session: <code id="sid">{{ session_id }}</code></div>
+        <div><a class="btn" href="/" title="Start over"><i class="fa-solid fa-arrow-left"></i> Back</a></div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- success overlay -->
+<div id="success" class="success">
+  <div>
+    <div class="tick"></div>
+    <h1>Success!</h1>
+    <p>Your PowerPoint has been generated and will download automatically.</p>
+    <p>Returning to main page in <span id="countdown">8</span>…</p>
+  </div>
+</div>
+
+<script>
+const sessionId = "{{ session_id }}";
+const totalSteps = 8;
+
+function setStepState(n, state, message){
+  const el = document.getElementById(`step-${n}`);
+  if(!el) return;
+  el.classList.remove('active','done','error');
+  el.classList.add(state);
+  const desc = el.querySelector('.desc');
+  if(message && desc) desc.textContent = message;
+  const sp = el.querySelector('.spinner');
+  const ok = el.querySelector('.check');
+  const er = el.querySelector('.err');
+  if(state==='active'){ if(sp){sp.classList.remove('hidden')} }
+  else { if(sp){sp.classList.add('hidden')} }
+  if(state==='done'){
+    if(!ok){ el.insertAdjacentHTML('beforeend','<div class="check"><i class="fa-solid fa-check"></i></div>'); }
+  }
+  if(state==='error'){
+    if(!er){ el.insertAdjacentHTML('beforeend','<div class="err"><i class="fa-solid fa-xmark"></i></div>'); }
+  }
+  // auto-mark older steps as done
+  if(state==='active' || state==='done'){
+    for(let i=1;i<n;i++){
+      const prev=document.getElementById(`step-${i}`);
+      if(prev){ prev.classList.remove('active','error'); prev.classList.add('done'); const s=prev.querySelector('.spinner'); if(s){s.classList.add('hidden')} }
+    }
+  }
+}
+
+async function poll(){
+  try{
+    const res = await fetch(`/progress/${sessionId}`);
+    if(!res.ok) throw new Error('Progress check failed');
+    const data = await res.json();
+
+    if(data.step>0){
+      const state = data.status==='completed' ? 'done' : (data.status==='error'?'error':'active');
+      setStepState(data.step, state, data.message || '');
+    }
+
+    // finished?
+    if(data.status==='completed' && data.step===totalSteps){
+      // trigger download, then show success overlay + redirect
+      await triggerDownload();
+      showSuccessThenReturn();
+      return; // stop polling
+    }
+
+    // error?
+    if(data.status==='error'){
+      alert(data.message || 'An error occurred.');
+      return; // stop polling
+    }
+
+    // keep polling
+    setTimeout(poll, 1000);
+  }catch(e){
+    console.error(e);
+    setTimeout(poll, 1500);
+  }
+}
+
+async function triggerDownload(){
+  try{
+    const resp = await fetch(`/download-generated/${sessionId}`);
+    if(resp.ok){
+      const blob = await resp.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `IMARC_Generated_Presentation_${Date.now()}.pptx`;
+      document.body.appendChild(a); a.click();
+      URL.revokeObjectURL(url); a.remove();
+    }else{
+      // If not ready, the success overlay still shows but no file; user can try again from /
+      console.warn('Download not ready:', await resp.text());
+    }
+  }catch(err){
+    console.error('Download error', err);
+  }
+}
+
+function showSuccessThenReturn(){
+  const overlay = document.getElementById('success');
+  overlay.classList.add('show');
+  let t=8;
+  const cd = document.getElementById('countdown');
+  const timer = setInterval(()=>{
+    t--; if(cd) cd.textContent = t;
+    if(t<=0){ clearInterval(timer); window.location.href = '/'; }
+  },1000);
+}
+
+// initialize: highlight step 1 as active
+setStepState(1,'active');
+poll();
+</script>
+</body>
+</html>

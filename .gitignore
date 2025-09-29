@@ -1,0 +1,21 @@
+# Ignore Python bytecode files
+__pycache__/
+*.pyc
+*.pyo
+
+# Ignore environment files
+.env
+.venv/
+
+# Ignore output and log directories
+outputs/
+uploads/
+
+# Ignore configuration and setup files
+*.yml
+*.yaml
+*.log
+
+# Ignore other system files
+.DS_Store
+Thumbs.db

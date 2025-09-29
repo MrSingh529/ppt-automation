@@ -1,0 +1,2031 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IMARC PowerPoint Automation Suite</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* iOS System Colors */
+            --primary-color: #007AFF;        /* iOS Blue */
+            --primary-dark: #0051D0;         /* Darker iOS Blue */
+            --secondary-color: #F2F2F7;      /* iOS Background Gray */
+            --accent-color: #5AC8FA;         /* iOS Light Blue */
+            --success-color: #34C759;        /* iOS Green */
+            --error-color: #FF3B30;          /* iOS Red */
+            --text-primary: #000000;         /* iOS Primary Text */
+            --text-secondary: #8E8E93;       /* iOS Secondary Text */
+            --text-muted: #C7C7CC;           /* iOS Tertiary Text */
+            --border-color: #C6C6C8;         /* iOS Separator */
+            --background-primary: #FFFFFF;   /* iOS Background */
+            --background-secondary: #F2F2F7; /* iOS Grouped Background */
+            
+            /* iOS Shadows */
+            --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+            --shadow-md: 0 4px 16px 0 rgba(0, 0, 0, 0.12);
+            --shadow-lg: 0 8px 32px 0 rgba(0, 0, 0, 0.16);
+            
+            /* iOS Radius */
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 20px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
+            font-feature-settings: "kern" 1;
+            -webkit-font-smoothing: antialiased;
+            text-rendering: optimizeLegibility;
+            background: var(--background-secondary);
+        }
+
+        /* Header */
+        .header-brand {
+            background: rgba(248, 248, 248, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 0.5px solid var(--border-color);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding: 0.75rem 0;
+        }
+
+        .brand-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .brand-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .brand-icon {
+            width: 44px;  /* iOS standard touch target */
+            height: 44px;
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.375rem;
+        }
+
+        .brand-text h1 {
+            font-size: 1.45m;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 0;
+            letter-spacing: -0.02em;
+        }
+
+        .brand-subtitle {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .status-badge {
+            background: rgba(52, 199, 89, 0.1);
+            border: 1px solid rgba(52, 199, 89, 0.2);
+            color: var(--success-color);
+            padding: 0.375rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8125rem;
+            font-weight: 600;
+        }
+
+        /* Main Content - Full Width */
+        .main-wrapper {
+            margin-top: 90px;
+            padding: 3rem 2rem;
+            min-height: calc(100vh - 90px);
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .hero-section {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .hero-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2.0rem, 5vw, 4rem);
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            line-height: 1.1;
+        }
+
+        /* Upload Section */
+        .upload-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 3rem;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .upload-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 0.5px solid rgba(255, 255, 255, 0.2);
+            border-radius: var(--radius-lg);
+            box-shadow: 
+                0 1px 3px rgba(0, 0, 0, 0.12),
+                0 1px 2px rgba(0, 0, 0, 0.24),
+                inset 0 1px 0 rgba(255, 255, 255, 0.5);
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .upload-card:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 
+                0 8px 25px rgba(0, 122, 255, 0.15),
+                0 4px 16px rgba(0, 0, 0, 0.12);
+            border-color: var(--primary-color);
+        }
+
+        .upload-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .upload-header-content {
+            flex: 1;
+        }
+
+
+        .upload-icon-header {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-sm);
+            background: var(--secondary-color);
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-color);
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .upload-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+        }
+
+        .upload-description {
+            font-size: 0.8125rem;
+            color: var(--text-secondary);
+            margin: 0;
+            line-height: 1.4;
+        }
+
+        .file-drop-zone {
+            border: 2px dashed var(--border-color);
+            border-radius: var(--radius-lg);
+            background: var(--background-primary);
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            position: relative;
+        }
+
+        .file-drop-zone:hover {
+            border-color: var(--primary-color);
+            background: rgba(0, 122, 255, 0.03);
+            transform: translateY(-1px);
+        }
+        .file-drop-zone.dragover {
+            border-color: var(--primary-color);
+            background: #f0f7ff;
+            border-style: solid;
+        }
+
+        .file-drop-zone.has-file {
+            border-color: var(--success-color);
+            background: #f0fdf4;
+            border-style: solid;
+        }
+
+        .drop-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.125rem;
+            margin: 0 auto 1rem;
+        }
+
+        .file-input {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .drop-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .drop-text {
+            font-weight: 500;
+            color: var(--text-primary);
+            font-size: 0.875rem;
+            margin: 0;
+        }
+
+        .drop-subtext {
+            color: var(--text-secondary);
+            font-size: 0.8125rem;
+            margin: 0;
+        }
+
+        .file-selected {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: var(--secondary-color);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+            display: none;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .file-selected.show {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .file-details {
+            flex: 1;
+        }
+
+        .file-name {
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 0.875rem;
+        }
+
+        .file-size {
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+        }
+
+        .remove-file {
+            padding: 0.5rem;
+            border: none;
+            background: var(--error-color);
+            color: white;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .remove-file:hover {
+            background: #dc2626;
+            transform: scale(1.05);
+        }
+
+        .file-info {
+            margin-top: 1rem;
+            font-size: 0.8125rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+        }
+
+        /* Action Section */
+        .action-section {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .generate-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.875rem 2rem;
+            border-radius: var(--radius-md);
+            font-size: 1.0625rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            box-shadow: var(--shadow-sm);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .generate-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 50%);
+            transition: opacity 0.2s;
+            opacity: 0;
+        }
+
+        .generate-btn:hover::before {
+            opacity: 1;
+        }
+
+        .generate-btn:active {
+            transform: scale(0.98);
+        }
+
+        .generate-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px 0 rgb(37 99 235 / 0.15);
+        }
+
+        .generate-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-icon {
+            transition: transform 0.3s ease;
+        }
+
+        .generate-btn:hover .btn-icon {
+            transform: rotate(180deg);
+        }
+
+        /* Loading State */
+        .loading {
+            display: none;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: white;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-color);
+            text-align: center;
+            max-width: 500px;
+            box-shadow: var(--shadow-md);
+        }
+
+        .loading.show {
+            display: block;
+            animation: slideUp 0.3s ease;
+        }
+
+        .loading-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .spinner {
+            width: 32px;
+            height: 32px;
+            border: 3px solid var(--border-color);
+            border-top: 3px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        .loading-text {
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 1.125rem;
+        }
+
+        .loading-subtext {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .progress-container {
+            width: 100%;
+            height: 6px;
+            background: var(--border-color);
+            border-radius: 3px;
+            margin-top: 1.5rem;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+            width: 0%;
+            border-radius: 3px;
+            animation: progress 3s ease-in-out;
+        }
+
+        /* Features Section */
+        .features-section {
+            background: white;
+            border-radius: var(--radius-xl);
+            padding: 3rem;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-color);
+        }
+
+        .features-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .features-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .features-subtitle {
+            color: var(--text-secondary);
+            font-size: 1.125rem;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 1.5rem;
+            background: var(--secondary-color);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .feature-item:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+            background: white;
+        }
+
+        .feature-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: var(--radius-md);
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.25rem;
+            flex-shrink: 0;
+        }
+
+        .feature-content {
+            flex: 1;
+        }
+
+        .feature-name {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .feature-text {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            line-height: 1.6;
+        }
+
+        /* Alerts */
+        .alert {
+            padding: 1rem 1.25rem;
+            margin: 1.5rem auto;
+            border-radius: var(--radius-lg);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            max-width: 600px;
+            animation: alertSlide 0.3s ease forwards;
+        }
+
+        .alert-error {
+            background: #fef2f2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+
+        .alert-success {
+            background: #f0fdf4;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+        }
+
+        .alert-icon {
+            font-size: 1.25rem;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes alertSlide {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes progress {
+            0% { width: 0%; }
+            50% { width: 70%; }
+            100% { width: 100%; }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .upload-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .brand-container {
+                padding: 0 1rem;
+            }
+            
+            .main-wrapper {
+                padding: 2rem 1rem;
+            }
+            
+            .hero-title {
+                font-size: 2.0rem;
+            }
+            
+            .upload-card {
+                padding: 1.5rem;
+            }
+            
+            .features-section {
+                padding: 2rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .upload-section {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+            
+            .upload-card {
+                min-width: unset;
+            }
+            
+            .hero-title {
+                font-size: 2rem;
+            }
+            
+            .generate-btn {
+                width: 100%;
+                min-width: unset;
+            }
+        }
+
+        .info-button {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: color 0.2s ease;
+            background: transparent;
+            border: none;
+            padding: 0.25rem;
+        }
+        .brand-actions { display:flex; gap:0.75rem; align-items:center; }
+        .info-button:hover {
+            color: var(--primary-color);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 2000;
+            background: rgba(8, 15, 25, 0.5);
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            }
+
+            .modal[aria-hidden="false"] {
+            display: flex;
+            }
+
+            .modal-dialog {
+                background: var(--background-primary);
+                border-radius: var(--radius-xl);
+                box-shadow: 
+                    0 20px 40px rgba(0, 0, 0, 0.15),
+                    0 4px 16px rgba(0, 0, 0, 0.08);
+                overflow: hidden;
+                animation: modalSlideUp 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            }
+
+            @keyframes modalSlideUp {
+                from {
+                    opacity: 0;
+                    transform: translateY(50px) scale(0.95);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0) scale(1);
+                }
+            }
+
+            /* header */
+            .modal-header {
+                background: var(--background-secondary);
+                padding: 1rem 1.5rem;
+                border-bottom: 0.5px solid var(--border-color);
+            }
+            .modal-header h2 {
+            font-size: 1.25rem;
+            margin:0;
+            color:var(--text-primary);
+            }
+
+            /* close */
+            .modal-close {
+            background: transparent;
+            border: none;
+            font-size: 1.4rem;
+            line-height: 1;
+            cursor: pointer;
+            color: var(--text-secondary);
+            }
+            .modal-close:hover { color: var(--error-color); }
+
+            /* body */
+            .modal-body {
+            padding: 1.25rem 1.5rem;
+            }
+            .about-lead {
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            font-size: 0.975rem;
+            }
+
+            /* grid */
+            .about-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+            }
+            .about-item {
+            display:flex;
+            gap:0.75rem;
+            align-items:flex-start;
+            padding: 0.9rem;
+            border-radius: var(--radius-md);
+            background: linear-gradient(180deg, #fbfdff, #f7fbff);
+            border: 1px solid var(--border-color);
+            }
+            .about-icon {
+            width:44px;
+            height:44px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            border-radius:10px;
+            background: linear-gradient(135deg,var(--primary-color), var(--accent-color));
+            color:white;
+            font-size:1.1rem;
+            flex-shrink:0;
+            }
+            .about-content .about-name {
+            font-weight:700;
+            color:var(--text-primary);
+            font-size:0.9rem;
+            }
+            .about-content .about-text {
+            color:var(--text-secondary);
+            font-size:0.85rem;
+            margin-top:3px;
+            }
+
+            /* extra details list */
+            .about-extra {
+            margin-top: 0.5rem;
+            padding-top: 0.5rem;
+            border-top: 1px dashed var(--border-color);
+            }
+            .about-extra h4 {
+            margin: 0.5rem 0;
+            font-size: 1rem;
+            color: var(--text-primary);
+            }
+            .about-extra ul {
+            margin: 0.5rem 0 0 1.1rem;
+            color: var(--text-secondary);
+            line-height:1.5;
+            }
+
+            /* footer */
+            .modal-footer {
+            display:flex;
+            flex-direction:column;
+            gap:0.5rem;
+            padding:1rem 1.5rem;
+            border-top:1px solid var(--border-color);
+            background: linear-gradient(180deg, #ffffff, #fbfdff);
+            }
+            .modal-actions {
+            display:flex;
+            gap:0.75rem;
+            justify-content:flex-end;
+            align-items:center;
+            }
+            .btn-primary, .btn-secondary {
+            padding: 0.6rem 0.95rem;
+            border-radius: 8px;
+            font-weight:600;
+            text-decoration:none;
+            border: none;
+            }
+            .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: #fff;
+            }
+            .btn-secondary {
+            background: transparent;
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            }
+
+            /* small footer note */
+            .modal-footnote {
+            color: var(--text-muted);
+            font-size: 0.82rem;
+            margin-top:0.25rem;
+            text-align:right;
+            }
+
+            /* small responsive tweak */
+            @media (max-width:480px) {
+            .about-grid { grid-template-columns: 1fr; }
+            .modal-dialog { margin: 0 0.5rem; max-width: 95%; }
+            }
+
+        /* Progress Tracking Styles - ENHANCED */
+        .progress-tracking {
+            display: none;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: white;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-color);
+            max-width: 800px;
+            box-shadow: var(--shadow-md);
+        }
+
+        .progress-tracking.show {
+            display: block;
+            animation: slideUp 0.3s ease;
+            /* Enhanced styling when it's the main focus */
+            padding: 3rem;
+            box-shadow: var(--shadow-xl);
+            border: 2px solid var(--primary-color);
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .progress-header h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .progress-summary {
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .steps-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .step-item {
+            background: var(--background-primary);
+            border: 0.5px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 1rem;
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .step-item.active {
+            background: rgba(0, 122, 255, 0.05);
+            border-color: var(--primary-color);
+            transform: translateX(4px);
+        }
+
+        .step-item.completed {
+            background: #f0fdf4;
+            border-color: var(--success-color);
+        }
+
+        .step-item.error {
+            background: #fef2f2;
+            border-color: var(--error-color);
+        }
+
+        .step-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .step-item.active .step-icon {
+            background: var(--primary-color);
+            color: white;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .step-item.completed .step-icon {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .step-item.error .step-icon {
+            background: var(--error-color);
+            color: white;
+        }
+
+        .step-content {
+            flex: 1;
+        }
+
+        .step-title {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .step-description {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .step-status {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            transition: all 0.3s ease;
+        }
+
+        .step-item.active .step-status {
+            color: var(--primary-color);
+            animation: spin 2s linear infinite;
+        }
+
+        .step-item.completed .step-status {
+            color: var(--success-color);
+        }
+
+        .step-item.completed .step-status i:before {
+            content: "\f00c";
+        }
+
+        .step-item.error .step-status {
+            color: var(--error-color);
+        }
+
+        .step-item.error .step-status i:before {
+            content: "\f00d";
+        }
+
+        @media (max-width: 768px) {
+            .step-item {
+                gap: 0.75rem;
+            }
+            
+            .step-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 1rem;
+            }
+            
+            .progress-header {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+        }
+
+        .success-fullscreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: linear-gradient(135deg, #10b981, #059669);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            color: white;
+            text-align: center;
+        }
+
+        .success-content {
+            max-width: 600px;
+            padding: 2rem;
+            animation: successAppear 0.6s ease-out;
+        }
+
+        .success-tick {
+            width: 120px;
+            height: 120px;
+            border: 4px solid white;
+            border-radius: 50%;
+            margin: 0 auto 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: tickPulse 0.8s ease-out;
+            position: relative;
+        }
+
+        .success-tick::before {
+            content: '';
+            position: absolute;
+            width: 40px;
+            height: 20px;
+            border: 4px solid white;
+            border-top: none;
+            border-right: none;
+            transform: rotate(-45deg);
+            animation: tickDraw 0.6s ease-out 0.3s both;
+        }
+
+        .success-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            font-family: 'Playfair Display', serif;
+            animation: slideUp 0.6s ease-out 0.2s both;
+            opacity: 0;
+        }
+
+        .success-message {
+            font-size: 1.2rem;
+            margin-bottom: 3rem;
+            opacity: 0;
+            animation: slideUp 0.6s ease-out 0.4s both;
+        }
+
+        .countdown-timer {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid white;
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            backdrop-filter: blur(10px);
+            animation: slideUp 0.6s ease-out 0.6s both;
+            opacity: 0;
+        }
+
+        .countdown-number {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            animation: countdownPulse 1s infinite;
+        }
+
+        .countdown-text {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        /* Animation Keyframes */
+        @keyframes successAppear {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes tickPulse {
+            0% {
+                transform: scale(0);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        @keyframes tickDraw {
+            from {
+                width: 0;
+                height: 0;
+            }
+            to {
+                width: 40px;
+                height: 20px;
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes countdownPulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+        }
+
+        /* Company Logo Styling */
+        .company-logo {
+            width: 50px;
+            height: 50px;
+            object-fit: contain;
+            object-position: center;
+            background: white;
+            border-radius: var(--radius-md);
+            padding: 4px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .company-logo:hover {
+            transform: scale(1.05);
+            box-shadow: var(--shadow-md);
+        }
+
+        /* Alternative styling without background */
+        .company-logo.no-bg {
+            background: transparent;
+            border: none;
+            box-shadow: none;
+            padding: 0;
+        }
+
+        /* Logo container adjustments */
+        .brand-logo {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        }
+
+        /* Ensure proper alignment */
+        .brand-text {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        /* Mobile responsive logo */
+        @media (max-width: 768px) {
+            .company-logo {
+            width: 40px;
+            height: 40px;
+            }
+        }
+
+        @media (max-width: 480px) {
+        .company-logo {
+            width: 32px;
+            height: 32px;
+        }
+
+        .brand-logo {
+            gap: 0.5rem;
+            }
+        }
+
+        /* High DPI display support */
+        @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+        .company-logo {
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: crisp-edges;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header-brand">
+        <div class="brand-container">
+            <div class="brand-logo">
+                <!-- Option 1: Use this for image logo -->
+                <img src="/static/images/IMARClogo.jpg" 
+                    alt="imarc Logo" 
+                    class="company-logo">
+                
+                <div class="brand-text">
+                    <h1>IMARC</h1>
+                    <div class="brand-subtitle">PowerPoint Automation Suite</div>
+                </div>
+            </div>
+            
+            <div class="brand-actions" style="display:flex; gap:0.75rem; align-items:center;">
+                <div class="status-badge">
+                    <i class="fas fa-shield-check"></i>
+                    Still In Beta
+                </div>
+                <button class="info-button" onclick="openAbout()" aria-label="About application">
+                    <i class="fas fa-info-circle"></i>
+                </button>
+        </div>
+    </header>
+
+    <div id="aboutModal" class="modal" aria-hidden="true" role="dialog" aria-labelledby="aboutTitle" tabindex="-1">
+        <div class="modal-dialog" role="document">
+            <header class="modal-header">
+            <h2 id="aboutTitle">About IMARC Data²Deck</h2>
+            <button class="modal-close" aria-label="Close about dialog" onclick="closeAbout()">×</button>
+            </header>
+
+            <div class="modal-body">
+            <p class="about-lead">
+                Transform Excel data into professional PowerPoint decks quickly — intelligent mapping, chart updates, table population and AI-driven content suggestions.
+            </p>
+
+            <div class="about-grid">
+                <div class="about-item">
+                <div class="about-icon"><i class="fas fa-user-cog"></i></div>
+                <div class="about-content">
+                    <div class="about-name">Developed by</div>
+                    <div class="about-text">Harpinder Singh</div>
+                </div>
+                </div>
+
+                <div class="about-item">
+                <div class="about-icon"><i class="fas fa-copyright"></i></div>
+                <div class="about-content">
+                    <div class="about-name">Copyright</div>
+                    <div class="about-text">© IMARC. All rights reserved.</div>
+                </div>
+                </div>
+
+                <div class="about-item">
+                <div class="about-icon"><i class="fas fa-life-ring"></i></div>
+                <div class="about-content">
+                    <div class="about-name">Support</div>
+                    <div class="about-text">
+                    <a href="mailto:support@imarcgroup.com">support@imarcgroup.com</a><br>
+                    +91 22 1234 5678
+                    </div>
+                </div>
+                </div>
+
+                <div class="about-item">
+                <div class="about-icon"><i class="fas fa-file-contract"></i></div>
+                <div class="about-content">
+                    <div class="about-name">License</div>
+                    <div class="about-text">IMARC internal use license — see deliverables & T&C for full terms.</div>
+                </div>
+                </div>
+
+                <div class="about-item">
+                <div class="about-icon"><i class="fas fa-code"></i></div>
+                <div class="about-content">
+                    <div class="about-name">Version</div>
+                    <div class="about-text">v1.0.0 (Beta)</div>
+                </div>
+                </div>
+
+                <div class="about-item">
+                <div class="about-icon"><i class="fas fa-shield-alt"></i></div>
+                <div class="about-content">
+                    <div class="about-name">Privacy</div>
+                    <div class="about-text">Uploaded files are processed and removed after generation. See company policy for details.</div>
+                </div>
+                </div>
+            </div>
+
+            <div class="about-extra">
+                <h4>What this app does</h4>
+                <ul>
+                <li>Automatically maps Excel cells to placeholder tags in slides.</li>
+                <li>Regenerates charts & updates tables while keeping formatting.</li>
+                <li>AI-assisted market summary generation for slide overviews.</li>
+                <li>Progress tracking with downloadable output.</li>
+                </ul>
+            </div>
+
+            </div>
+
+            <footer class="modal-footer">
+            <div class="modal-actions">
+                <button class="btn-secondary" onclick="closeAbout()">Close</button>
+                <a class="btn-primary" href="/static/imarc-data2deck.pdf" target="_blank" rel="noopener">View Documentation</a>
+            </div>
+            <div class="modal-footnote">Delivered to IMARC — Cutom Atomation by Harpinder Singh</div>
+            </footer>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="main-wrapper">
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <h1 class="hero-title">IMARC Data²Deck</h1>
+        </section>
+
+        <!-- Flash messages placeholder -->
+        <div id="messages"></div>
+
+        <form id="uploadForm" enctype="multipart/form-data">
+            <!-- Upload Section -->
+            <section class="upload-section">
+                <div class="upload-card">
+                    <div class="upload-header">
+                        <div class="upload-icon-header">
+                            <i class="fas fa-file-excel"></i>
+                        </div>
+                        <div class="upload-header-content">
+                            <h3 class="upload-title">Excel Data Source</h3>
+                            <p class="upload-description">Upload your Excel file containing the data to be processed</p>
+                        </div>
+                    </div>
+                    
+                    <div class="file-drop-zone" data-target="excelfile">
+                        <input type="file" id="excelfile" name="excelfile" accept=".xlsx,.xls" required class="file-input">
+                        <div class="drop-content">
+                            <div class="drop-icon">
+                                <i class="fas fa-upload"></i>
+                            </div>
+                            <div class="drop-text">Choose Excel file</div>
+                            <div class="drop-subtext">or drag and drop</div>
+                        </div>
+                    </div>
+                    
+                    <div class="file-selected" id="excelselected">
+                        <div class="file-details">
+                            <div class="file-name"></div>
+                            <div class="file-size"></div>
+                        </div>
+                        <button type="button" class="remove-file" onclick="removeFile('excelfile')">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="upload-card">
+                    <div class="upload-header">
+                        <div class="upload-icon-header">
+                            <i class="fas fa-file-powerpoint"></i>
+                        </div>
+                        <div class="upload-header-content">
+                            <h3 class="upload-title">PowerPoint Template</h3>
+                            <p class="upload-description">Upload your presentation template with placeholder tags</p>
+                        </div>
+                    </div>
+                    
+                    <div class="file-drop-zone" data-target="pptfile">
+                        <input type="file" id="pptfile" name="pptfile" accept=".pptx,.ppt" required class="file-input">
+                        <div class="drop-content">
+                            <div class="drop-icon">
+                                <i class="fas fa-upload"></i>
+                            </div>
+                            <div class="drop-text">Choose PowerPoint file</div>
+                            <div class="drop-subtext">or drag and drop</div>
+                        </div>
+                    </div>
+                    
+                    <div class="file-selected" id="pptselected">
+                        <div class="file-details">
+                            <div class="file-name"></div>
+                            <div class="file-size"></div>
+                        </div>
+                        <button type="button" class="remove-file" onclick="removeFile('pptfile')">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Action Section -->
+            <section class="action-section">
+                <button type="submit" class="generate-btn" id="generateBtn">
+                    <i class="fas fa-cogs btn-icon"></i>
+                    Generate Presentation
+                </button>
+            </section>
+        </form>
+
+        <div class="loading" id="loadingDiv">
+            <div class="loading-content">
+                <div class="spinner"></div>
+                <div class="loading-text">Processing Your Files</div>
+            </div>
+            <div class="loading-subtext">
+                Analyzing data structure and generating presentation content...
+            </div>
+            <div class="progress-container">
+                <div class="progress-bar"></div>
+            </div>
+        </div>
+
+        <!-- Progress Tracking Section -->
+        <div class="progress-tracking" id="progressTracking" style="display: none;">
+            <div class="progress-header">
+                <h3>Processing Steps</h3>
+                <div class="progress-summary">
+                    <span id="currentStep">0</span> of <span id="totalSteps">8</span> completed
+                </div>
+            </div>
+            
+            <div class="steps-container">
+                <div class="step-item" id="step-1">
+                    <div class="step-icon">
+                        <i class="fas fa-file-excel"></i>
+                    </div>
+                    <div class="step-content">
+                        <div class="step-title">Reading Excel Data</div>
+                        <div class="step-description">Loading worksheets and extracting key-value pairs</div>
+                    </div>
+                    <div class="step-status">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                </div>
+
+                <div class="step-item" id="step-2">
+                    <div class="step-icon">
+                        <i class="fas fa-database"></i>
+                    </div>
+                    <div class="step-content">
+                        <div class="step-title">Processing Data Sheets</div>
+                        <div class="step-description">Extracting segmentation data and market metrics</div>
+                    </div>
+                    <div class="step-status">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                </div>
+
+                <div class="step-item" id="step-3">
+                    <div class="step-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <div class="step-content">
+                        <div class="step-title">AI Content Generation</div>
+                        <div class="step-description">Generating market insights and overview content</div>
+                    </div>
+                    <div class="step-status">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                </div>
+
+                <div class="step-item" id="step-4">
+                    <div class="step-icon">
+                        <i class="fas fa-file-powerpoint"></i>
+                    </div>
+                    <div class="step-content">
+                        <div class="step-title">Loading PowerPoint Template</div>
+                        <div class="step-description">Opening presentation template and identifying placeholders</div>
+                    </div>
+                    <div class="step-status">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                </div>
+
+                <div class="step-item" id="step-5">
+                    <div class="step-icon">
+                        <i class="fas fa-exchange-alt"></i>
+                    </div>
+                    <div class="step-content">
+                        <div class="step-title">Replacing Placeholders</div>
+                        <div class="step-description">Updating text, tables, and list placeholders</div>
+                    </div>
+                    <div class="step-status">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                </div>
+
+                <div class="step-item" id="step-6">
+                    <div class="step-icon">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <div class="step-content">
+                        <div class="step-title">Updating Charts</div>
+                        <div class="step-description">Regenerating charts with latest data</div>
+                    </div>
+                    <div class="step-status">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                </div>
+
+                <div class="step-item" id="step-7">
+                    <div class="step-icon">
+                        <i class="fas fa-table"></i>
+                    </div>
+                    <div class="step-content">
+                        <div class="step-title">Processing Tables</div>
+                        <div class="step-description">Filling company data and dynamic tables</div>
+                    </div>
+                    <div class="step-status">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                </div>
+
+                <div class="step-item" id="step-8">
+                    <div class="step-icon">
+                        <i class="fas fa-save"></i>
+                    </div>
+                    <div class="step-content">
+                        <div class="step-title">Saving Presentation</div>
+                        <div class="step-description">Finalizing and saving the generated presentation</div>
+                    </div>
+                    <div class="step-status">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Success Full Screen -->
+        <div id="successFullscreen" class="success-fullscreen">
+            <div class="success-content">
+                <div class="success-tick"></div>
+                <h1 class="success-title">Success!</h1>
+                <p class="success-message">Your PowerPoint presentation has been generated and downloaded successfully.</p>
+                
+                <div class="countdown-timer">
+                    <div id="countdownNumber" class="countdown-number">10</div>
+                    <div class="countdown-text">Redirecting to main page...</div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        let lastFocusedElement = null;
+    
+        function openAbout() {
+            const modal = document.getElementById('aboutModal');
+            lastFocusedElement = document.activeElement;
+            modal.setAttribute('aria-hidden', 'false');
+            const focusable = modal.querySelector('button, a, [tabindex]:not([tabindex="-1"])');
+            if (focusable) focusable.focus();
+            document.addEventListener('keydown', aboutEscHandler);
+        }
+        
+        function closeAbout() {
+            const modal = document.getElementById('aboutModal');
+            modal.setAttribute('aria-hidden', 'true');
+            if (lastFocusedElement) lastFocusedElement.focus();
+            document.removeEventListener('keydown', aboutEscHandler);
+        }
+        
+        function aboutEscHandler(e) {
+            if (e.key === 'Escape' || e.key === 'Esc') {
+                closeAbout();
+            }
+        }
+    
+        // File size formatter
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+    
+        // Remove file function - FIXED FUNCTION NAME
+        function removeFile(inputId) {
+            const input = document.getElementById(inputId);
+            const container = document.querySelector(`[data-target="${inputId}"]`);
+            const selectedDiv = document.getElementById(inputId + 'selected');
+    
+            input.value = '';
+            container.classList.remove('has-file');
+            if (selectedDiv) {
+                selectedDiv.classList.remove('show');
+            }
+        }
+    
+        // Progress tracking functions
+        function updateProgress(stepNumber, status = 'active') {
+            const step = document.getElementById(`step-${stepNumber}`);
+            const currentStepSpan = document.getElementById('currentStep');
+            
+            console.log(`Updating progress: Step ${stepNumber}, Status: ${status}`);
+            
+            if (!step) {
+                console.log(`Step ${stepNumber} element not found`);
+                return;
+            }
+            
+            // Remove all status classes
+            step.classList.remove('active', 'completed', 'error');
+            
+            // Add new status
+            step.classList.add(status);
+            
+            // Update step counter
+            const completedSteps = document.querySelectorAll('.step-item.completed').length;
+            if (currentStepSpan) {
+                currentStepSpan.textContent = completedSteps;
+            }
+            
+            // Mark previous steps as completed
+            if (status === 'active' || status === 'completed') {
+                for (let i = 1; i < stepNumber; i++) {
+                    const prevStep = document.getElementById(`step-${i}`);
+                    if (prevStep) {
+                        prevStep.classList.remove('active', 'error');
+                        prevStep.classList.add('completed');
+                    }
+                }
+            }
+        }
+    
+        function showProgressTracking() {
+            console.log('Showing progress tracking');
+            const progressDiv = document.getElementById('progressTracking');
+            const loadingDiv = document.getElementById('loadingDiv');
+            
+            if (!progressDiv) {
+                console.error('Progress tracking div not found!');
+                return;
+            }
+            
+            // Hide loading, show progress tracking
+            if (loadingDiv) loadingDiv.classList.remove('show');
+            progressDiv.classList.add('show');
+            progressDiv.style.display = 'block';
+            
+            console.log('Progress tracking should now be visible');
+        }
+    
+        function hideProgressTracking() {
+            const progressDiv = document.getElementById('progressTracking');
+            if (progressDiv) {
+                progressDiv.classList.remove('show');
+                progressDiv.style.display = 'none';
+            }
+            
+            // Reset all steps
+            document.querySelectorAll('.step-item').forEach(step => {
+                step.classList.remove('active', 'completed', 'error');
+            });
+            const currentStepSpan = document.getElementById('currentStep');
+            if (currentStepSpan) {
+                currentStepSpan.textContent = '0';
+            }
+        }
+    
+        function showSuccessFullscreen() {
+            console.log('Showing full screen success');
+            const successScreen = document.getElementById('successFullscreen');
+            if (successScreen) {
+                successScreen.style.display = 'flex';
+                startCountdownTimer();
+            }
+        }
+    
+        function startCountdownTimer() {
+            let timeLeft = 10;
+            const countdownElement = document.getElementById('countdownNumber');
+            
+            const countdown = setInterval(() => {
+                timeLeft--;
+                if (countdownElement) {
+                    countdownElement.textContent = timeLeft;
+                }
+                
+                if (timeLeft <= 0) {
+                    clearInterval(countdown);
+                    const successScreen = document.getElementById('successFullscreen');
+                    if (successScreen) {
+                        successScreen.style.display = 'none';
+                    }
+                    // Reset form
+                    document.getElementById('uploadForm').reset();
+                    document.querySelectorAll('.file-selected').forEach(el => {
+                        el.classList.remove('show');
+                    });
+                    document.querySelectorAll('.file-drop-zone').forEach(el => {
+                        el.classList.remove('has-file');
+                    });
+                }
+            }, 1000);
+        }
+    
+        // Function to monitor progress and handle completion
+        function startProgressMonitoring(sessionId) {
+            console.log('Starting progress monitoring for session:', sessionId);
+            
+            const progressInterval = setInterval(async () => {
+                try {
+                    const response = await fetch(`/progress/${sessionId}`);
+                    if (!response.ok) {
+                        throw new Error('Progress check failed');
+                    }
+                    const data = await response.json();
+                    
+                    console.log('Progress data received:', data);
+                    
+                    if (data.step > 0) {
+                        updateProgress(data.step, data.status);
+                        
+                        // Update step description with current message
+                        if (data.message) {
+                            const stepElement = document.getElementById(`step-${data.step}`);
+                            if (stepElement) {
+                                const descElement = stepElement.querySelector('.step-description');
+                                if (descElement && data.status === 'active') {
+                                    descElement.textContent = data.message;
+                                }
+                            }
+                        }
+                        
+                        // Check if completed
+                        if (data.status === 'completed' && data.step === 8) {
+                            console.log('All steps completed, triggering download...');
+                            clearInterval(progressInterval);
+                            
+                            // Trigger download
+                            setTimeout(() => {
+                                triggerDownloadFromExistingFile(sessionId);
+                            }, 1000);
+                        }
+                        
+                        // Check if error occurred
+                        if (data.status === 'error') {
+                            console.log('Error occurred:', data.message);
+                            clearInterval(progressInterval);
+                            handleError(data.message);
+                        }
+                    }
+                } catch (error) {
+                    console.error('Progress monitoring error:', error);
+                    clearInterval(progressInterval);
+                    handleError('Progress monitoring failed');
+                }
+            }, 1000);
+            
+            return progressInterval;
+        }
+    
+        // Download without re-processing
+        async function triggerDownloadFromExistingFile(sessionId) {
+            try {
+                const downloadUrl = `/download-generated/${sessionId}`;
+                
+                const response = await fetch(downloadUrl);
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `IMARC_Generated_Presentation_${Date.now()}.pptx`;
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+                    
+                    handleSuccess();
+                } else {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Download failed');
+                }
+            } catch (error) {
+                console.error('Download error:', error);
+                handleError('Download failed: ' + error.message);
+            }
+        }
+    
+        // Handle successful completion
+        function handleSuccess() {
+            const generateBtn = document.getElementById('generateBtn');
+            
+            setTimeout(() => {
+                hideProgressTracking();
+                showSuccessFullscreen();
+            }, 1000);
+            
+            // Reset UI
+            if (generateBtn) {
+                generateBtn.disabled = false;
+                generateBtn.innerHTML = '<i class="fas fa-cogs btn-icon"></i> Generate Presentation';
+            }
+        }
+    
+        // Handle errors
+        function handleError(errorMessage) {
+            const generateBtn = document.getElementById('generateBtn');
+            const messagesDiv = document.getElementById('messages');
+            
+            setTimeout(() => {
+                hideProgressTracking();
+                if (messagesDiv) {
+                    messagesDiv.innerHTML = `
+                        <div class="alert alert-error">
+                            <i class="fas fa-exclamation-triangle alert-icon"></i>
+                            <div><strong>Error:</strong> ${errorMessage}</div>
+                        </div>
+                    `;
+                }
+            }, 1000);
+            
+            // Reset UI
+            if (generateBtn) {
+                generateBtn.disabled = false;
+                generateBtn.innerHTML = '<i class="fas fa-cogs btn-icon"></i> Generate Presentation';
+            }
+        }
+    
+        // File input change handlers - FIXED FUNCTION
+        function setupFileInput(inputId) {
+            const input = document.getElementById(inputId);
+            const container = document.querySelector(`[data-target="${inputId}"]`);
+            const selectedDiv = document.getElementById(inputId + 'selected');
+    
+            if (!input || !container) {
+                console.error(`File input elements not found for: ${inputId}`);
+                return;
+            }
+    
+            input.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    // Validate file type
+                    const validTypes = inputId === 'excelfile' ? 
+                        ['.xlsx', '.xls'] : ['.pptx', '.ppt'];
+                    const extension = '.' + file.name.split('.').pop().toLowerCase();
+    
+                    if (!validTypes.includes(extension)) {
+                        alert(`Please select a valid ${inputId === 'excelfile' ? 'Excel' : 'PowerPoint'} file (${validTypes.join(', ')})`);
+                        this.value = '';
+                        return;
+                    }
+    
+                    // Validate file size (50MB limit)
+                    if (file.size > 50 * 1024 * 1024) {
+                        alert('File size must be less than 50MB');
+                        this.value = '';
+                        return;
+                    }
+    
+                    // Update UI
+                    container.classList.add('has-file');
+                    if (selectedDiv) {
+                        selectedDiv.querySelector('.file-name').textContent = file.name;
+                        selectedDiv.querySelector('.file-size').textContent = formatFileSize(file.size);
+                        selectedDiv.classList.add('show');
+                    }
+                } else {
+                    container.classList.remove('has-file');
+                    if (selectedDiv) {
+                        selectedDiv.classList.remove('show');
+                    }
+                }
+            });
+    
+            // Drag and drop handlers
+            container.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                this.classList.add('dragover');
+            });
+    
+            container.addEventListener('dragleave', function(e) {
+                e.preventDefault();
+                this.classList.remove('dragover');
+            });
+    
+            container.addEventListener('drop', function(e) {
+                e.preventDefault();
+                this.classList.remove('dragover');
+    
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    input.files = files;
+                    input.dispatchEvent(new Event('change'));
+                }
+            });
+    
+            // Click handler for container
+            container.addEventListener('click', function() {
+                input.click();
+            });
+        }
+    
+        // Initialize file inputs - FIXED IDS
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded, initializing file inputs');
+            
+            // Use the correct IDs from your HTML
+            setupFileInput('excelfile');
+            setupFileInput('pptfile');
+    
+            // Upload cards animation
+            const uploadCards = document.querySelectorAll('.upload-card');
+            uploadCards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                card.style.transition = 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
+    
+                setTimeout(() => {
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, 100 + (index * 200));
+            });
+    
+            // Form submission handler
+            const uploadForm = document.getElementById('uploadForm');
+            if (uploadForm) {
+                uploadForm.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+    
+                    const formData = new FormData(this);
+                    const generateBtn = document.getElementById('generateBtn');
+                    const messagesDiv = document.getElementById('messages');
+    
+                    // Validate files are selected
+                    const excelFile = document.getElementById('excelfile').files[0];
+                    const pptFile = document.getElementById('pptfile').files[0];
+    
+                    if (!excelFile || !pptFile) {
+                        if (messagesDiv) {
+                            messagesDiv.innerHTML = `
+                                <div class="alert alert-error">
+                                    <i class="fas fa-exclamation-triangle alert-icon"></i>
+                                    <div>Please select both Excel and PowerPoint files</div>
+                                </div>
+                            `;
+                        }
+                        return;
+                    }
+    
+                    // Generate a unique session ID for progress tracking
+                    const sessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                    formData.append('session_id', sessionId);
+    
+                    console.log('Form submitted with session ID:', sessionId);
+    
+                    // Clear previous messages
+                    if (messagesDiv) messagesDiv.innerHTML = '';
+    
+                    // Show initial loading state
+                    if (generateBtn) {
+                        generateBtn.disabled = true;
+                        generateBtn.innerHTML = '<i class="fas fa-spinner fa-spin btn-icon"></i> Processing...';
+                    }
+                    
+                    const loadingDiv = document.getElementById('loadingDiv');
+                    if (loadingDiv) loadingDiv.classList.add('show');
+    
+                    try {
+                        const response = await fetch('/generate-with-progress', { method: 'POST', body: formData });
+                        if (!response.ok) {
+                            const errorData = await response.json();
+                            throw new Error(errorData.error || `Server error: ${response.status}`);
+                        }
+                        const result = await response.json();
+                        console.log('Generation started:', result);
+
+                        // NEW: go to the full-screen progress page
+                        if (result.redirect_url) {
+                            window.location.href = result.redirect_url;
+                        } else {
+                            // fallback if backend didn’t return a URL
+                            window.location.href = `/progress-view/${sessionId}`;
+                        }
+                        } catch (error) {
+                        console.error('Error:', error);
+                        handleError(error.message);
+                    }
+                });
+            }
+    
+            // Click outside modal to close
+            document.addEventListener('click', function(e) {
+                const modal = document.getElementById('aboutModal');
+                if (!modal) return;
+                if (modal.getAttribute('aria-hidden') === 'false' && e.target === modal) {
+                    closeAbout();
+                }
+            });
+        });
+    
+        // Add keyboard navigation support
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                const target = e.target.closest('.file-drop-zone');
+                if (target) {
+                    const input = target.querySelector('.file-input');
+                    if (input) input.click();
+                }
+            }
+        });
+    </script>
+</body>
+</html>
