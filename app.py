@@ -213,6 +213,40 @@ def generate_with_progress():
     except Exception as e:
         return jsonify({'error': f'Upload failed: {str(e)}'}), 500
 
+@app.route('/progress/<session_id>')
+def get_progress_status(session_id):
+    """Get progress status for real-time updates"""
+    progress = get_progress(session_id)
+    return jsonify(progress)
+
+@app.route('/progress-view/<session_id>')
+def progress_view(session_id):
+    """Render the progress page"""
+    return render_template('progress.html', session_id=session_id)
+
+@app.route('/download-generated/<session_id>')
+def download_generated_file(session_id):
+    """Download the generated file directly"""
+    try:
+        progress = get_progress(session_id)
+        if progress['status'] != 'completed' or progress['step'] != 8:
+            return jsonify({'error': 'File not ready for download'}), 400
+
+        file_path = progress.get('file_path')
+        if file_path and os.path.exists(file_path):
+            filename = os.path.basename(file_path)
+            return send_file(
+                file_path,
+                as_attachment=True,
+                download_name=filename,
+                mimetype='application/vnd.openxmlformats-officedocument.presentationml.presentation'
+            )
+        else:
+            return jsonify({'error': 'Generated file not found'}), 404
+            
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 @app.route('/health')
 def health_check():
     return {"status": "healthy", "timestamp": datetime.now().isoformat()}
