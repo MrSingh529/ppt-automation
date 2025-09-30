@@ -211,18 +211,8 @@ def generate_with_progress():
                 # Step 1: Files already saved
                 update_progress(session_id, 1, 'completed', 'Files saved successfully')
 
-                # ✅ IMMEDIATE FIX: Direct callback instead of wrapper
-                def direct_progress_callback(step, status, message, file_path=None):
-                    print(f"🔔 DIRECT CALLBACK: step={step}, status={status}, session={session_id}")
-                    final_path = output_path if (status == 'completed' and step == 8) else file_path
-                    update_progress(session_id, step, status, message, final_path)
-                    print(f"✅ DIRECT UPDATE_PROGRESS CALLED for session {session_id}")
-
-                # Set callback directly in main_script
-                set_progress_callback(direct_progress_callback)
-
-                # Call main function directly
-                generate_ppt(excel_path, ppt_path, output_path)
+                # Pass session_id directly to main function
+                generate_ppt(excel_path, ppt_path, output_path, session_id=session_id)
                 
             except Exception as e:
                 current_step = get_progress(session_id).get('step', 1)
@@ -256,6 +246,22 @@ def generate_with_progress():
         
     except Exception as e:
         return jsonify({'error': f'Upload failed: {str(e)}'}), 500
+
+@app.route('/progress-update/<session_id>', methods=['POST'])
+def progress_update_endpoint(session_id):
+    """Receive progress updates from main_script via HTTP"""
+    try:
+        data = request.get_json(force=True)
+        step = data['step']
+        status = data['status']
+        message = data.get('message', '')
+        file_path = data.get('file_path')
+        
+        update_progress(session_id, step, status, message, file_path)
+        return jsonify({'success': True})
+    except Exception as e:
+        print(f"Error updating progress: {e}")
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/progress/<session_id>')
 def get_progress_status(session_id):

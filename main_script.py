@@ -15,16 +15,39 @@ import anthropic
 from pptx.enum.dml import MSO_COLOR_TYPE
 import os
 
-# Progress callback for real-time updates
-progress_callback = None
+# Progress tracking - use HTTP instead of callback
+import requests
 
-def set_progress_callback(callback_func):
-    global progress_callback
-    progress_callback = callback_func
+# Get Flask port from environment or default
+FLASK_PORT = os.environ.get('PORT', '10000')
 
 def update_step_progress(step, status, message, file_path=None):
-    if progress_callback:
-        progress_callback(step, status, message, file_path)
+    """Send progress update via HTTP POST to Flask"""
+    # Get session_id from global variable set by Flask
+    session_id = globals().get('CURRENT_SESSION_ID')
+    if not session_id:
+        print(f"Warning: No session_id set, skipping progress update for step {step}")
+        return
+    
+    try:
+        data = {
+            'step': step,
+            'status': status,
+            'message': message,
+            'file_path': file_path
+        }
+        requests.post(
+            f'http://localhost:{FLASK_PORT}/progress-update/{session_id}',
+            json=data,
+            timeout=2
+        )
+        print(f"✅ Progress update sent: step={step}, status={status}, session={session_id}")
+    except Exception as e:
+        print(f"Warning: Could not send progress update: {e}")
+
+# This function is still needed for compatibility
+def set_progress_callback(callback_func):
+    pass  # No longer needed, but keep for compatibility
 
 # Setup Claude with proper error handling
 api_key = os.environ.get('ANTHROPIC_API_KEY')
@@ -3306,10 +3329,11 @@ def debug_and_fix_charts(prs, volumes, unit):
 
 # --------------- main ---------------
 
-def main(excel_file, ppt_template, output_ppt, callback=None):
+def main(excel_file, ppt_template, output_ppt, session_id=None):
     """Main function to process PPT automation with progress tracking"""
-    global progress_callback
-    progress_callback = callback
+    # Set global session_id for progress tracking
+    if session_id:
+        globals()['CURRENT_SESSION_ID'] = session_id
     
     try:
         # Step 2: Reading Excel data
@@ -3448,13 +3472,11 @@ def main(excel_file, ppt_template, output_ppt, callback=None):
         
     except Exception as e:
         print(f"Error in main processing: {e}")
-        if progress_callback:
-            progress_callback(8, 'error', f'Processing error: {str(e)}')
+        update_step_progress(8, 'error', f'Processing error: {str(e)}')
         raise
-
 
 if __name__ == "__main__":
     excel_file = "Datasheet-HS_test.xlsx"
     ppt_template = "test_ppt.pptx"
     output_ppt = "updated_presentation.pptx"
-    main(excel_file, ppt_template, output_ppt)
+    main(excel_file, ppt_template, output_ppt, session_id)
