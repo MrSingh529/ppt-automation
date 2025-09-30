@@ -1264,6 +1264,41 @@
             image-rendering: crisp-edges;
             }
         }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center; 
+            justify-content: center;
+            z-index: 9999;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .modal-content button {
+            margin-top: 1.5rem;
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            border: none;
+            background-color: #007AFF;
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            opacity: 0.5;
+        }
+
+        .modal-content button:enabled {
+            opacity: 1;
+        }
     </style>
 </head>
 <body>
@@ -1313,6 +1348,17 @@
         onmouseout="this.style.background='rgba(255, 59, 48, 0.1)'">
             <i class="fas fa-sign-out-alt"></i>
         </a>
+    </div>
+
+    <div id="startupModal" class="modal-overlay">
+        <div class="modal-content">
+            <h2>Notice</h2>
+            <p>
+            Automation is still in development right now. These mentioned things will be updated in the ppt for now.
+            Please choose the Excel template and test PPT template provided by the dev (Harpinder Singh).
+            </p>
+            <button id="modalCloseBtn" disabled>Close</button>
+        </div>
     </div>
 
     <div id="aboutModal" class="modal" aria-hidden="true" role="dialog" aria-labelledby="aboutTitle" tabindex="-1">
@@ -2096,6 +2142,30 @@
                     if (input) input.click();
                 }
             }
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const modal = document.getElementById('startupModal');
+            const btn = document.getElementById('modalCloseBtn');
+            
+            let countdown = 10; // seconds
+            btn.textContent = `Please wait ${countdown} seconds`;
+            
+            const timer = setInterval(() => {
+                countdown--;
+                if(countdown > 0){
+                    btn.textContent = `Please wait ${countdown} seconds`;
+                    btn.disabled = true;
+                } else {
+                    btn.textContent = 'Close';
+                    btn.disabled = false;
+                    clearInterval(timer);
+                }
+            }, 1000);
+
+            btn.addEventListener('click', () => {
+                modal.style.display = 'none';
+            });
         });
     </script>
 </body>
