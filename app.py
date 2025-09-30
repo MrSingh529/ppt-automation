@@ -10,15 +10,15 @@ import gc
 import json
 import threading
 from io import BytesIO
+from datetime import timedelta
 import uuid
-from functools import wraps  # NEW: For login decorator
-
-# Import your existing script functions  
+from functools import wraps  
 from main_script import main as generate_ppt, set_progress_callback
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('FLASK_SECRET_KEY', 'dev-key-change-in-production')
 app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024  # 50MB max file size
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta (minutes=1)  # Session timeout
 
 # For cloud deployment, create temporary folders
 UPLOAD_FOLDER = tempfile.mkdtemp()
@@ -112,7 +112,7 @@ def login():
         
         if username == AUTH_USERNAME and password == AUTH_PASSWORD:
             session['authenticated'] = True
-            session.permanent = True  # Keep user logged in
+            session.permanent = False  # Session only lasts for browser session
             return redirect(url_for('index'))
         else:
             flash('Invalid credentials. Please try again.', 'error')

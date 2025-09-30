@@ -1290,8 +1290,30 @@
                 <button class="info-button" onclick="openAbout()" aria-label="About application">
                     <i class="fas fa-info-circle"></i>
                 </button>
+            </div>
         </div>
     </header>
+
+    <!-- Logout Button -->
+    <div style="position: fixed; top: 1rem; right: 1rem; z-index: 1000;">
+        <a href="/logout" style="
+            background: rgba(255, 59, 48, 0.1);
+            color: #FF3B30;
+            padding: 0.625rem 1.25rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            border: 1px solid rgba(255, 59, 48, 0.2);
+            transition: all 0.3s;
+        " onmouseover="this.style.background='rgba(255, 59, 48, 0.15)'" 
+        onmouseout="this.style.background='rgba(255, 59, 48, 0.1)'">
+            <i class="fas fa-sign-out-alt"></i>
+        </a>
+    </div>
 
     <div id="aboutModal" class="modal" aria-hidden="true" role="dialog" aria-labelledby="aboutTitle" tabindex="-1">
         <div class="modal-dialog" role="document">
