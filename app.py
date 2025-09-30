@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, send_file, flash, redirect, url_for, jsonify, Response
+from flask import Flask, render_template, request, send_file, flash, redirect, url_for, jsonify, Response, session
 import os
 import tempfile
 import shutil
@@ -11,6 +11,7 @@ import json
 import threading
 from io import BytesIO
 import uuid
+from functools import wraps  # NEW: For login decorator
 
 # Import your existing script functions  
 from main_script import main as generate_ppt, set_progress_callback
@@ -27,6 +28,19 @@ ALLOWED_EXTENSIONS = {'xlsx', 'pptx'}
 # Progress tracking globals (in-memory)
 progress_data = {}
 progress_lock = threading.Lock()
+
+# NEW: Authentication credentials
+AUTH_USERNAME = os.environ.get('AUTH_USERNAME', 'imarc')
+AUTH_PASSWORD = os.environ.get('AUTH_PASSWORD', 'imarc2024')
+
+# NEW: Login required decorator
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not session.get('authenticated'):
+            return redirect(url_for('login'))
+        return f(*args, **kwargs)
+    return decorated_function
 
 def update_progress(session_id, step, status='active', message='', file_path=None):
     """Update progress for a specific session"""
@@ -89,11 +103,36 @@ def generate_ppt_with_progress(excel_path, ppt_path, output_path, session_id):
     # Call your main function
     generate_ppt(excel_path, ppt_path, output_path)
 
+# NEW: Login route
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+        
+        if username == AUTH_USERNAME and password == AUTH_PASSWORD:
+            session['authenticated'] = True
+            session.permanent = True  # Keep user logged in
+            return redirect(url_for('index'))
+        else:
+            flash('Invalid credentials. Please try again.', 'error')
+    
+    return render_template('login.html')
+
+# NEW: Logout route
+@app.route('/logout')
+def logout():
+    session.pop('authenticated', None)
+    flash('You have been logged out successfully.', 'success')
+    return redirect(url_for('login'))
+
 @app.route('/')
+@login_required  # NEW: Protected
 def index():
     return render_template('index.html')
 
 @app.route('/generate', methods=['POST'])
+@login_required  # NEW: Protected
 def generate():
     """Generate presentation using temporary files only"""
     temp_dir = None
@@ -171,6 +210,7 @@ def generate():
                 print(f"Warning: Could not clean up temp directory: {e}")
 
 @app.route('/generate-with-progress', methods=['POST'])
+@login_required  # NEW: Protected
 def generate_with_progress():
     """Generate presentation with real-time progress updates"""
     session_id = str(uuid.uuid4())
@@ -270,11 +310,13 @@ def get_progress_status(session_id):
     return jsonify(progress)
 
 @app.route('/progress-view/<session_id>')
+@login_required  # NEW: Protected
 def progress_view(session_id):
     """Render the progress page"""
     return render_template('progress.html', session_id=session_id)
 
 @app.route('/download-generated/<session_id>')
+@login_required  # NEW: Protected
 def download_generated_file(session_id):
     """Download the generated file directly"""
     try:
