@@ -173,7 +173,7 @@ def generate():
 @app.route('/generate-with-progress', methods=['POST'])
 def generate_with_progress():
     """Generate presentation with real-time progress updates"""
-    session_id = str(uuid.uuid4())  # ✅ Remove duplicate import uuid line
+    session_id = str(uuid.uuid4())
     
     try:
         # Validate files
@@ -210,9 +210,19 @@ def generate_with_progress():
             try:
                 # Step 1: Files already saved
                 update_progress(session_id, 1, 'completed', 'Files saved successfully')
-                
-                # Call the progress-aware generation function
-                generate_ppt_with_progress(excel_path, ppt_path, output_path, session_id)
+
+                # ✅ IMMEDIATE FIX: Direct callback instead of wrapper
+                def direct_progress_callback(step, status, message, file_path=None):
+                    print(f"🔔 DIRECT CALLBACK: step={step}, status={status}, session={session_id}")
+                    final_path = output_path if (status == 'completed' and step == 8) else file_path
+                    update_progress(session_id, step, status, message, final_path)
+                    print(f"✅ DIRECT UPDATE_PROGRESS CALLED for session {session_id}")
+
+                # Set callback directly in main_script
+                set_progress_callback(direct_progress_callback)
+
+                # Call main function directly
+                generate_ppt(excel_path, ppt_path, output_path)
                 
             except Exception as e:
                 current_step = get_progress(session_id).get('step', 1)
