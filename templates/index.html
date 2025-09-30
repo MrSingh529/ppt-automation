@@ -687,11 +687,60 @@
             .modal-dialog {
                 background: var(--background-primary);
                 border-radius: var(--radius-xl);
-                box-shadow: 
-                    0 20px 40px rgba(0, 0, 0, 0.15),
-                    0 4px 16px rgba(0, 0, 0, 0.08);
+                box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15), 0 4px 16px rgba(0, 0, 0, 0.08);
                 overflow: hidden;
                 animation: modalSlideUp 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+                
+                /* Mobile fixes */
+                max-width: 90vw;
+                max-height: 85vh;
+                width: 100%;
+                display: flex;
+                flex-direction: column;
+            }
+
+            .modal-body {
+                padding: 1.25rem 1.5rem;
+                overflow-y: auto; /* Enable scrolling */
+                flex: 1; /* Allow body to grow and shrink */
+                -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+            }
+
+            /* Mobile-specific modal improvements */
+            @media (max-width: 768px) {
+                .modal {
+                    padding: 1rem;
+                }
+                
+                .modal-dialog {
+                    margin: 0;
+                    max-height: 90vh;
+                    width: 100%;
+                    max-width: 100%;
+                    border-radius: var(--radius-lg);
+                }
+                
+                .modal-body {
+                    max-height: calc(90vh - 120px); /* Account for header and footer */
+                    padding: 1rem;
+                }
+                
+                .about-grid {
+                    grid-template-columns: 1fr; /* Single column on mobile */
+                    gap: 0.75rem;
+                }
+                
+                .about-item {
+                    padding: 0.75rem;
+                }
+                
+                .modal-header {
+                    padding: 1rem;
+                }
+                
+                .modal-footer {
+                    padding: 1rem;
+                }
             }
 
             @keyframes modalSlideUp {
