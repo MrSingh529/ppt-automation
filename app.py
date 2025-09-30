@@ -66,14 +66,25 @@ def safe_cleanup(file_paths):
 def generate_ppt_with_progress(excel_path, ppt_path, output_path, session_id):
     """Wrapper function to call main script with progress updates"""
     
+    # Store session_id in a way that ensures it's captured correctly
+    _session_id = session_id  # Create a local copy
+    
     def progress_update_callback(step, status, message, file_path=None):
         """Callback function to update progress"""
-        # Use output_path instead of file_path for completed status
-        final_path = output_path if status == 'completed' and step == 8 else file_path
-        update_progress(session_id, step, status, message, final_path)
+        print(f"🔔 CALLBACK TRIGGERED: step={step}, status={status}, session={_session_id}")  # DEBUG LINE
+        
+        # Use output_path for completed status
+        final_path = output_path if (status == 'completed' and step == 8) else file_path
+        
+        # Call the Flask update_progress function
+        update_progress(_session_id, step, status, message, final_path)
+        
+        print(f"✅ UPDATE_PROGRESS CALLED for session {_session_id}")  # DEBUG LINE
     
     # Set the callback in main_script
     set_progress_callback(progress_update_callback)
+    
+    print(f"📌 Callback set for session: {_session_id}")  # DEBUG LINE
     
     # Call your main function
     generate_ppt(excel_path, ppt_path, output_path)
